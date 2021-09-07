@@ -1,6 +1,8 @@
+
 from django.contrib.auth.models import User
 from django.db import models
 import mistune
+
 
 # Create your models here.
 class Category(models.Model):
@@ -15,7 +17,7 @@ class Category(models.Model):
     status = models.PositiveIntegerField(default=STATUS_NORMAL, choices=STATUS_ITEMS,
                                          verbose_name="状态")
     is_nav = models.BooleanField(default=False, verbose_name="是否为导航")
-    owner = models.ForeignKey(User, verbose_name="作者",on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     class Meta:
@@ -29,16 +31,17 @@ class Category(models.Model):
         categories = cls.objects.filter(status=cls.STATUS_NORMAL)
         nav_categories = []
         normal_categories = []
-        #只需一次数据库查询，即可拿到所有数据
+        # 只需一次数据库查询，即可拿到所有数据
         for cate in categories:
             if cate.is_nav:
                 nav_categories.append(cate)
             else:
                 normal_categories.append(cate)
         return {
-            'navs':nav_categories,
-            'categories':normal_categories,
+            'navs': nav_categories,
+            'categories': normal_categories,
         }
+
 
 class Tag(models.Model):
     STATUS_NORMAL = 1
@@ -51,7 +54,7 @@ class Tag(models.Model):
     name = models.CharField(max_length=10, verbose_name="名称")
     status = models.PositiveIntegerField(default=STATUS_NORMAL, choices=STATUS_ITEMS,
                                          verbose_name="状态")
-    owner = models.ForeignKey(User, verbose_name="作者",on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
     class Meta:
@@ -59,6 +62,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Post(models.Model):
     STATUS_NORMAL = 1
@@ -75,13 +79,13 @@ class Post(models.Model):
     content = models.TextField(verbose_name="正文", help_text="正文必须为MarkDown格式")
     status = models.PositiveIntegerField(default=STATUS_NORMAL, choices=STATUS_ITEMS,
                                          verbose_name="状态")
-    category = models.ForeignKey(Category, verbose_name="分类",on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, verbose_name="分类", on_delete=models.CASCADE)
     tag = models.ManyToManyField(Tag, verbose_name="标签")
-    owner = models.ForeignKey(User, verbose_name="作者",on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, verbose_name="作者", on_delete=models.CASCADE)
     created_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     pv = models.PositiveIntegerField(default=1)
     uv = models.PositiveIntegerField(default=1)
-    content_html = models.TextField(verbose_name="正文html代码",blank=True,editable=False)
+    content_html = models.TextField(verbose_name="正文html代码", blank=True, editable=False)
 
     @classmethod
     def hot_posts(cls):
@@ -95,7 +99,7 @@ class Post(models.Model):
             tag = None
             post_list = []
         else:
-            post_list = tag.post_set.filter(status=Post.STATUS_NORMAL).select_related('owner','category')
+            post_list = tag.post_set.filter(status=Post.STATUS_NORMAL).select_related('owner', 'category')
         return post_list, tag
 
     @staticmethod
